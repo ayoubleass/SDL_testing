@@ -37,11 +37,12 @@ typedef struct {
 }Player;
 */
 
+#define PI 3.14159
 
 
 int init_instance(SDL_Instance * instance, SDL_Renderer** gRenderer);
 void close(SDL_Instance *instance, SDL_Renderer *renderer);
-void process(int *runing, SDL_Rect *p);
+void process(int *running, SDL_Rect *p, float *pAngle, float* pdeX, float* pdY);
 
 
 void draw(SDL_Renderer *renderer,  SDL_Rect *p,int map[10][10]);

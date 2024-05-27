@@ -1,5 +1,6 @@
 #include "../headers/main.h"
 #include <stdio.h>
+#include <math.h>
 /**
  * 
  * init_instance -
@@ -33,9 +34,9 @@ int init_instance(SDL_Instance * instance,  SDL_Renderer**gRenderer){
     }
     return (1);
 }
-void move(int key, SDL_Rect **p);
+void move(int key, SDL_Rect **p, float **pAngle, float **pdX, float **pdY);
 
-void process(int *running, SDL_Rect *p){
+void process(int *running, SDL_Rect *p, float *pAngle, float *pdX, float *pdY){
     SDL_Event event;
     SDL_PollEvent(&event);
     switch(event.type)
@@ -44,24 +45,32 @@ void process(int *running, SDL_Rect *p){
             *running = 0;
             break;
         case SDL_KEYDOWN:
-            move(event.key.keysym.sym, &p);
+            move(event.key.keysym.sym, &p, &pAngle, &pdX, &pdY);
             break; 
     }
 }
 
-void move(int key, SDL_Rect **p){
+void move(int key, SDL_Rect **p, float **pAngle, float **pdX, float **pdY){
     switch(key) {
         case SDLK_z: 
-            (*p)->y -= 32/2;
+            (*p)->x -=  **pdX;
+            (*p)->y -=  **pdY;
             break;
         case SDLK_s: 
-            (*p)->y += 32/2;
+            (*p)->x +=  **pdX;
+            (*p)->y +=  **pdY;
             break;
         case SDLK_d:
-            (*p)->x += 32/2;
+            **pAngle +=  0.1;
+            if (**pAngle > 2 * PI){**pAngle = 0 ;}
+                **pdX  = cos(**pAngle) * 5;
+                **pdY  = sin(**pAngle) * 5;
             break;
         case SDLK_q:
-            (*p)->x -= 32/2;
+            **pAngle -=  0.1;
+            if (**pAngle < 0){ **pAngle += 2 + PI;}
+            **pdX  = cos(**pAngle) * 5;
+            **pdY  = sin(**pAngle) * 5;
             break;
     }
 }
