@@ -1,5 +1,6 @@
 CC = gcc
-#FLAGS = -Wall -Werror -Wextra -pedantic -std=gnu89 
+#-Wall
+FLAGS = -Werror -Wextra -pedantic 
 
 SRC = src/*.c 
 NAME = run

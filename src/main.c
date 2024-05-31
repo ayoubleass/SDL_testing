@@ -1,15 +1,14 @@
-#include "../headers/main.h"
+#include "../headers/maze.h"
 #include <stdio.h>
 #include <stdbool.h>
 #include <stdlib.h>
 #include <math.h>
+#include <unistd.h>
 
 
-SDL_Renderer* gRenderer = NULL;
-int runing = 1;
 
 
-int map[10][10] = {
+int map[mapWidth][mapHeight] = {
     {1,1,1,1,1,1,1,1,1,1},
     {1,0,0,0,0,0,0,1,0,1},
     {1,0,0,0,0,0,0,0,0,1},
@@ -18,7 +17,7 @@ int map[10][10] = {
     {1,0,0,0,0,0,0,1,0,1},
     {1,0,0,0,0,0,0,1,0,1},
     {1,0,0,0,0,0,0,1,0,1},
-    {1,1,1,1,1,0,0,0,0,1},
+    {1,0,0,0,0,0,0,0,0,1},
     {1,1,1,1,1,1,1,1,1,1},
 };
    
@@ -26,30 +25,43 @@ int map[10][10] = {
 
 
 
+
+
 int main(int argc, char **argv) {
     SDL_Instance *instance = malloc(sizeof(SDL_Instance));
-    SDL_Rect player;
-    player.x = 32;
-    player.y  = 32;
-    player.w=15;
-    player.h = 15;
-    float pdeltaX, pdeltaY, pa; 
+    SDL_Event e;
+    Dir  direction;
+    Plan plan;  
+    SDL_Rect player = {.x = SCREEN_WIDTH/4, .y = SCREEN_HEIGHT/4, .w = 15, .h = 15};
+    int w = SCREEN_WIDTH , h = SCREEN_HEIGHT;
+    direction.x = -1, direction.y = 0; 
+    plan.x = 0, plan.y = 0.66;
+    (void)argc, (void)argv;
+    int game_running = init_instance(instance);
 
-    (void) argc, (void) argv;
-    runing = init_instance(instance, &gRenderer);
-    while(runing){ 
-        process(&runing, &player, &pa, &pdeltaX, &pdeltaY);
-        draw(gRenderer, &player ,map);        
-         /*Update the screen */
-        SDL_SetRenderDrawColor(gRenderer, 255, 0, 0, 255);
-        SDL_RenderDrawLine(gRenderer, player.x, player.y, player.x + pdeltaX * 10,
-        player.y + pdeltaY * 10);
+   
+ 
+    while (game_running) {
+        while (SDL_PollEvent(&e)) {
+            if (e.type == SDL_QUIT) {
+                game_running = 0;
+            }
+            if(e.type == SDL_KEYDOWN) {
+                if(e.key.keysym.sym == SDLK_LEFT || e.key.keysym.sym == SDLK_RIGHT){
+                    rotate(e.key.keysym.sym, &direction, &plan);
+                }else{
+                    move(e.key.keysym.sym ,&player, &direction, 10);
+                }
 
-        SDL_RenderPresent(gRenderer);
+            }
+        }
+        draw_map(instance);
+        debug(instance , &player, &direction, &plan);      
+        SDL_RenderPresent(instance->renderer);
+
     }
-    close(instance, gRenderer);
-    free(instance); 
-    return (0);
-}
-            
+    destroy_instance(instance);
+    free(instance);
+    return 0;
+}    
           
